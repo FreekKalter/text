@@ -1,4 +1,5 @@
-//TODO: add documentation
+// Package columnswriter imlements a write filter that prints evenly distributed
+// columns fitted to current terminal window size.
 package columnswriter
 
 import (
@@ -11,6 +12,7 @@ import (
 	"strings"
 )
 
+// A Writer is a filter that prints evenly distributed columns 
 type Writer struct {
 	output            io.Writer
 	nrTerminalColumns int
@@ -20,10 +22,18 @@ type Writer struct {
 	text []byte
 }
 
+// Create a writer object with specified values, see Init for explanation of
+// paramaters.
 func New(output io.Writer, inputSep rune, minWidth, padding int) *Writer {
 	return new(Writer).Init(output, inputSep, minWidth, padding)
 }
 
+// A Writer must be initialized with a call to Init. The first pararmater (output)
+// specifies the filter output. The inputSep is the character by wich each field
+// is seperated in the input later on. 
+//  
+//  minWidth: Is the minimum widht of a column
+//  padding:  The number of spaces between columns
 func (w *Writer) Init(output io.Writer, inputSep rune, minWidth, padding int) *Writer {
 	w.output = output
 	w.padding = padding
