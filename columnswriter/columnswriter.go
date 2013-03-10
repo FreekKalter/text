@@ -1,3 +1,4 @@
+//TODO: add documentation
 package columnswriter
 
 import (
@@ -5,6 +6,7 @@ import (
 	"io"
 	"math"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -13,20 +15,20 @@ type Writer struct {
 	output            io.Writer
 	nrTerminalColumns int
 	minWidth, padding int
-	tabChar           rune
+	inputSep          rune
 
 	text []byte
 }
 
-func New(output io.Writer, tabChar rune, minWidth, padding int) *Writer {
-	return new(Writer).Init(output, tabChar, minWidth, padding)
+func New(output io.Writer, inputSep rune, minWidth, padding int) *Writer {
+	return new(Writer).Init(output, inputSep, minWidth, padding)
 }
 
-func (w *Writer) Init(output io.Writer, tabChar rune, minWidth, padding int) *Writer {
+func (w *Writer) Init(output io.Writer, inputSep rune, minWidth, padding int) *Writer {
 	w.output = output
 	w.padding = padding
 	w.minWidth = minWidth
-	w.tabChar = tabChar
+	w.inputSep = inputSep
 	nrTerminalColumnsInt32, _ := strconv.ParseInt(os.Getenv("COLUMNS"), 10, 32)
 	w.nrTerminalColumns = int(nrTerminalColumnsInt32)
 	return w
@@ -38,18 +40,26 @@ func (w *Writer) Write(buf []byte) (n int, err error) {
 	return
 }
 
+func realLength(text string) (l int) {
+	ansiEscBeginRegex := regexp.MustCompile(`^(\x1b\[\d+m)+`)
+	ansiEscEndRegex := regexp.MustCompile(`(\x1b\[0m)+$`)
+	replaced := ansiEscBeginRegex.ReplaceAllString(ansiEscEndRegex.ReplaceAllString(text, ""), "")
+	l = len(replaced)
+	return
+}
+
 func (w *Writer) Flush() {
 
 	textString := strings.TrimRight(string(w.text), "\n")
-	items := strings.FieldsFunc(textString, func(r rune) bool { return r == w.tabChar })
+	items := strings.FieldsFunc(textString, func(r rune) bool { return r == w.inputSep })
 	nrItems := len(items)
 	var nrColumns, nrRows, totalWidth int = 0, 1, 0
 
 	for _, file := range items {
-		if (totalWidth + len(file) + 1) > w.nrTerminalColumns {
+		if (totalWidth + realLength(file) + 1) > w.nrTerminalColumns {
 			break
 		}
-		totalWidth += len(file) + 2
+		totalWidth += realLength(file) + 2
 		nrColumns++
 	}
 	calcNrRows := func(items, columns int) int {
@@ -69,8 +79,8 @@ func (w *Writer) Flush() {
 				if index >= nrItems {
 					break
 				}
-				if len(items[index]) > maxColumnWidth {
-					maxColumnWidth = len(items[index])
+				if realLength(items[index]) > maxColumnWidth {
+					maxColumnWidth = realLength(items[index])
 				}
 			}
 			totalWidth += maxColumnWidth + 2
@@ -94,13 +104,15 @@ func (w *Writer) Flush() {
 			if len(columnWidths) > 0 {
 				columnWidth = columnWidths[x]
 			} else {
-				columnWidth = len(items[index])
+				columnWidth = realLength(items[index])
 			}
 			columnWidth += w.padding
 			if columnWidth < w.minWidth {
 				columnWidth = w.minWidth
 			}
-			fmt.Fprintf(w.output, "%-*s", columnWidth, items[index])
+			// compensate difference in lenght when excluding ansi color escapes
+			lenDiff := len(items[index]) - realLength(items[index])
+			fmt.Fprintf(w.output, "%-*s", columnWidth+lenDiff, items[index])
 		}
 		fmt.Fprint(w.output, "\n")
 	}
