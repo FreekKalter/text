@@ -29,6 +29,8 @@ paramaters.
 ```go
 func (w *Writer) Flush()
 ```
+Does the actual printing, always call this after everthing you want to print has
+been printed.
 
 #### func (*Writer) Init
 
@@ -47,3 +49,4 @@ seperated in the input later on.
 ```go
 func (w *Writer) Write(buf []byte) (n int, err error)
 ```
+Implements Writer interface, so you can call it with the whole Fprint family

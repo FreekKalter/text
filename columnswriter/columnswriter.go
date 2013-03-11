@@ -44,6 +44,7 @@ func (w *Writer) Init(output io.Writer, inputSep rune, minWidth, padding int) *W
 	return w
 }
 
+// Implements Writer interface, so you can call it with the whole Fprint family
 func (w *Writer) Write(buf []byte) (n int, err error) {
 	w.text = append(w.text, buf...)
 	n = len(buf)
@@ -58,6 +59,8 @@ func realLength(text string) (l int) {
 	return
 }
 
+// Does the actual printing, always call this after everthing you want to print has
+// been printed.
 func (w *Writer) Flush() {
 
 	textString := strings.TrimRight(string(w.text), "\n")
@@ -122,7 +125,11 @@ func (w *Writer) Flush() {
 			}
 			// compensate difference in lenght when excluding ansi color escapes
 			lenDiff := len(items[index]) - realLength(items[index])
-			fmt.Fprintf(w.output, "%-*s", columnWidth+lenDiff, items[index])
+			if x == (nrColumns - 1) { // no spaces at end of line (last column)
+				fmt.Fprintf(w.output, "%s", items[index])
+			} else {
+				fmt.Fprintf(w.output, "%-*s", columnWidth+lenDiff, items[index])
+			}
 		}
 		fmt.Fprint(w.output, "\n")
 	}
