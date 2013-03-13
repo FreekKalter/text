@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-// A Writer is a filter that prints evenly distributed columns 
+// A Writer is a filter that prints evenly distributed columns
 type Writer struct {
 	output            io.Writer
 	nrTerminalColumns int
@@ -30,8 +30,8 @@ func New(output io.Writer, inputSep rune, minWidth, padding int) *Writer {
 
 // A Writer must be initialized with a call to Init. The first pararmater (output)
 // specifies the filter output. The inputSep is the character by wich each field
-// is seperated in the input later on. 
-//  
+// is seperated in the input later on.
+//
 //  minWidth: Is the minimum widht of a column
 //  padding:  The number of spaces between columns
 func (w *Writer) Init(output io.Writer, inputSep rune, minWidth, padding int) *Writer {
@@ -64,7 +64,7 @@ func realLength(text string) (l int) {
 func (w *Writer) Flush() {
 
 	textString := strings.TrimRight(string(w.text), "\n")
-	items := strings.FieldsFunc(textString, func(r rune) bool { return r == w.inputSep })
+	items := strings.FieldsFunc(textString, func(r rune) bool { return r == w.inputSep || r == '\n' })
 	nrItems := len(items)
 	var nrColumns, nrRows, totalWidth int = 0, 1, 0
 
