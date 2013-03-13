@@ -1,3 +1,7 @@
+// Copyright (c) 2013 Freek Kalter. All rights reserved.
+// Use of this source code is governed by the "Revised BSD License"
+// that can be found in the LICENSE file.
+
 package columnswriter
 
 import (

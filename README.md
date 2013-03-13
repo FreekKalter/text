@@ -88,3 +88,5 @@ Implements Writer interface, so you can call it with the whole Fprint family
 
 
 
+*Copyright (c) 2013 Freek Kalter.  All rights reserved.
+See the LICENSE file.*
