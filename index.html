@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Text : golang package text/columnwriter for printing nicely formatted columns in cli app. " />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Text</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/FreekKalter/text">View on GitHub</a>
+
+          <h1 id="project_title">Text</h1>
+          <h2 id="project_tagline">golang package text/columnwriter for printing nicely formatted columns in cli app. </h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/FreekKalter/text/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/FreekKalter/text/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="columnswriter" class="anchor" href="#columnswriter"><span class="octicon octicon-link"></span></a>columnswriter</h1>
+
+<hr><div class="highlight"><pre><span class="kn">import</span> <span class="s">"github.com/FreekKalter/text/columnswriter"</span>
+</pre></div>
+
+<p>Package columnswriter imlements a write filter that prints evenly distributed
+columns fitted to current terminal window size.</p>
+
+<h2>
+<a name="types" class="anchor" href="#types"><span class="octicon octicon-link"></span></a>TYPES</h2>
+
+<div class="highlight"><pre><span class="kd">type</span> <span class="nx">Writer</span> <span class="kd">struct</span> <span class="p">{</span>
+    <span class="c1">// contains filtered or unexported fields</span>
+<span class="p">}</span>
+
+</pre></div>
+
+<h4>
+<a name="new" class="anchor" href="#new"><span class="octicon octicon-link"></span></a>New</h4>
+
+<div class="highlight"><pre><span class="kd">func</span> <span class="nx">New</span><span class="p">(</span><span class="nx">output</span> <span class="nx">io</span><span class="p">.</span><span class="nx">Writer</span><span class="p">,</span> <span class="nx">inputSep</span> <span class="kt">rune</span><span class="p">,</span> <span class="nx">minWidth</span><span class="p">,</span> <span class="nx">padding</span> <span class="kt">int</span><span class="p">)</span> <span class="o">*</span><span class="nx">Writer</span>
+</pre></div>
+
+<p>Create a writer object with specified values, see Init for explanation of
+paramaters.</p>
+
+<h4>
+<a name="flush" class="anchor" href="#flush"><span class="octicon octicon-link"></span></a>Flush</h4>
+
+<div class="highlight"><pre><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Writer</span><span class="p">)</span> <span class="nx">Flush</span><span class="p">()</span>
+</pre></div>
+
+<p>Does the actual printing, always call this after everthing you want to print has
+been printed.</p>
+
+<div class="highlight"><pre><span class="nx">Example</span><span class="p">:</span>
+    <span class="c1">// Print to stdout, input separated by spaces, no min widht, 2 spaces padding</span>
+    <span class="nx">w</span> <span class="o">:=</span> <span class="nx">New</span><span class="p">(</span><span class="nx">os</span><span class="p">.</span><span class="nx">Stdout</span><span class="p">,</span> <span class="sc">' '</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="nx">w</span><span class="p">.</span><span class="nx">nrTerminalColumns</span> <span class="p">=</span> <span class="mi">80</span> <span class="c1">//for testing purposes, not necessary in real world</span>
+
+    <span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprintln</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">`This is a test that has a lot of words and treats every `</span><span class="p">)</span>
+    <span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprintln</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">`word as a column.`</span><span class="p">)</span>
+    <span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprintln</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">`It should print nicely formatted columns similar to ls `</span><span class="p">)</span>
+    <span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprintln</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">`directory lisings on nix systems.`</span><span class="p">)</span>
+
+    <span class="nx">w</span><span class="p">.</span><span class="nx">Flush</span><span class="p">()</span>
+
+    <span class="c1">// Output:</span>
+    <span class="c1">// This     is     a       test       that     has      a   lot      of</span>
+    <span class="c1">// words    and    treats  every      word     as       a   column.  It</span>
+    <span class="c1">// should   print  nicely  formatted  columns  similar  to  ls       directory</span>
+    <span class="c1">// lisings  on     nix     systems.</span>
+
+</pre></div>
+
+<h4>
+<a name="init" class="anchor" href="#init"><span class="octicon octicon-link"></span></a>Init</h4>
+
+<div class="highlight"><pre><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Writer</span><span class="p">)</span> <span class="nx">Init</span><span class="p">(</span><span class="nx">output</span> <span class="nx">io</span><span class="p">.</span><span class="nx">Writer</span><span class="p">,</span> <span class="nx">inputSep</span> <span class="kt">rune</span><span class="p">,</span> <span class="nx">minWidth</span><span class="p">,</span> <span class="nx">padding</span> <span class="kt">int</span><span class="p">)</span> <span class="o">*</span><span class="nx">Writer</span>
+</pre></div>
+
+<p>A Writer must be initialized with a call to Init. The first pararmater (output)
+specifies the filter output. The inputSep is the character by wich each field is
+seperated in the input later on.</p>
+
+<pre><code>minWidth: Is the minimum widht of a column
+padding:  The number of spaces between columns
+</code></pre>
+
+<h4>
+<a name="write" class="anchor" href="#write"><span class="octicon octicon-link"></span></a>Write</h4>
+
+<div class="highlight"><pre><span class="kd">func</span> <span class="p">(</span><span class="nx">w</span> <span class="o">*</span><span class="nx">Writer</span><span class="p">)</span> <span class="nx">Write</span><span class="p">(</span><span class="nx">buf</span> <span class="p">[]</span><span class="kt">byte</span><span class="p">)</span> <span class="p">(</span><span class="nx">n</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">err</span> <span class="kt">error</span><span class="p">)</span>
+</pre></div>
+
+<p>Implements Writer interface, so you can call it with the whole Fprint family</p>
+
+<p><em>Copyright (c) 2013 Freek Kalter.  All rights reserved.
+See the LICENSE file.</em></p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Text maintained by <a href="https://github.com/FreekKalter">FreekKalter</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
